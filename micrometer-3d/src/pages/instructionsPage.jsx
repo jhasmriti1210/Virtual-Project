@@ -8,7 +8,6 @@ const InstructionsPage = () => {
       </h1>
 
       <div className="flex flex-col lg:flex-row gap-10 items-center">
-        {/* Text Instructions */}
         <div className="lg:w-2/3 text-gray-800 space-y-6 text-lg">
           <p>
             A manual micrometer is a precision measuring instrument used to
@@ -55,12 +54,11 @@ const InstructionsPage = () => {
           </p>
         </div>
 
-        {/* Image */}
         <div className="lg:w-1/3">
           <img
             src="models/3.JPG"
             alt="Manual Micrometer"
-            className="rounded-lg shadow-lg w-full object-contain"
+            className="rounded-lg shadow-lg w-full h-96 object-contain"
           />
         </div>
       </div>

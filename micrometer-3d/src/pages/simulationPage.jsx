@@ -27,12 +27,10 @@ export default function MicrometerPage() {
       <Header />
 
       <main className="flex flex-col lg:flex-row gap-6 px-6 pt-8 max-w-screen-xl mx-auto">
-        {/* Simulation Area */}
         <div className="flex-1 bg-white rounded-xl shadow-md p-4">
           <MicrometerCanvas />
         </div>
 
-        {/* Instruction Area */}
         <div className="lg:w-1/3 w-full flex flex-col justify-between bg-white rounded-xl shadow-md p-6">
           <div>
             <h2 className="text-xl font-semibold text-gray-800 mb-4">

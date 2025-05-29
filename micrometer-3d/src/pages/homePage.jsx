@@ -10,7 +10,6 @@ import {
 const HomePage = () => {
   return (
     <div className="min-h-screen ">
-      {/* Hero Section */}
       <section className="text-center py-16 px-6">
         <h1 className="text-5xl md:text-6xl font-extrabold text-blue-900 mb-4 drop-shadow">
           Manual Micrometer Simulator
@@ -36,7 +35,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Features Section */}
       <section className="bg-white py-16 px-6 shadow-inner">
         <h2 className="text-3xl font-bold text-blue-900 text-center mb-10">
           What You Can Do

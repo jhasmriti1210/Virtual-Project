@@ -11,10 +11,7 @@ const VideoPage = () => {
         Manual Micrometer Simulator effectively.
       </p>
 
-      <div
-        className="relative"
-        style={{ paddingTop: "56.25%" /* 16:9 ratio */ }}
-      >
+      <div className="relative" style={{ paddingTop: "56.25%" }}>
         <iframe
           src="https://www.youtube.com/embed/hcI7K3BCEqc"
           title="How to Use Manual Micrometer Simulator"
