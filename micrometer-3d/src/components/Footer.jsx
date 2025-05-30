@@ -6,8 +6,8 @@ const Footer = () => {
       <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
         <div className="text-center md:text-left">
           <p className="text-sm font-light">
-            &copy; {new Date().getFullYear()} Manual Micrometer Simulator. All
-            rights reserved.
+            &copy; {new Date().getFullYear()} Advanced Measurement Simulator.
+            All rights reserved.
           </p>
         </div>
 

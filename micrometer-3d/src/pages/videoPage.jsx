@@ -13,7 +13,7 @@ const VideoPage = () => {
 
       <div className="relative" style={{ paddingTop: "56.25%" }}>
         <iframe
-          src="https://www.youtube.com/embed/hcI7K3BCEqc"
+          src="https://www.youtube.com/embed/cArXbfz3-HQ"
           title="How to Use Manual Micrometer Simulator"
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

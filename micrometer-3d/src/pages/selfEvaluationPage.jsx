@@ -30,6 +30,11 @@ export default function SelfEvaluation() {
               When you are done, click the "Mark as Complete" button to view
               your feedback.
             </p>
+            <img
+              src="models/1.png"
+              alt="Manual Micrometer"
+              className="rounded-lg  w-full h-96 object-contain mt-4"
+            />
           </div>
 
           {isComplete ? (

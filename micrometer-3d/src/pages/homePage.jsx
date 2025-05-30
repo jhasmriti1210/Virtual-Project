@@ -11,7 +11,7 @@ const HomePage = () => {
   return (
     <div className="min-h-screen ">
       <section className="text-center py-16 px-6">
-        <h1 className="text-5xl md:text-6xl font-extrabold text-blue-900 mb-4 drop-shadow">
+        <h1 className="text-5xl md:text-6xl font-extrabold text-blue-900 mb-4 ">
           Manual Micrometer Simulator
         </h1>
         <p className="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto mb-6">
@@ -35,7 +35,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      <section className="bg-white py-16 px-6 shadow-inner">
+      <section className="bg-white py-16 px-6 ">
         <h2 className="text-3xl font-bold text-blue-900 text-center mb-10">
           What You Can Do
         </h2>
