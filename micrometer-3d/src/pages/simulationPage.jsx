@@ -1,60 +1,57 @@
-import React, { useState } from "react";
+import React, { useRef } from "react";
 import MicrometerCanvas from "../components/micrometer";
-import StepGuide from "../components/stepGuide";
-import SuccessPrompt from "../components/successPrompt";
-import Header from "../components/Header";
+import ButtonControl from "../pages/buttonPage";
 
-const steps = [
-  "Rotate the thimble to move the spindle.",
-  "Place object between spindle and anvil.",
-  "Read the sleeve and thimble scale.",
-];
+export default function SimulationPage() {
+  const micrometerRef = useRef();
 
-export default function MicrometerPage() {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isComplete, setIsComplete] = useState(false);
+  const handleForward = () => {
+    micrometerRef.current?.moveThimbleForward();
+  };
 
-  const handleStepComplete = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
+  const handleBackward = () => {
+    micrometerRef.current?.moveThimbleBackward();
+  };
+
+  const handleLeft = () => {
+    micrometerRef.current?.rotateRatchetWithSound?.();
+  };
+
+  const handleRight = () => {
+    const thimblePos = micrometerRef.current?.getThimblePosition?.();
+    if (thimblePos && thimblePos > 0.02) {
+      micrometerRef.current?.insertBetweenJaws?.();
     } else {
-      setIsComplete(true);
+      console.log("Not enough space between anvil and spindle.");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
+    <div className="flex h-screen">
+      <div className="flex-1 relative">
+        <MicrometerCanvas ref={micrometerRef} />
+      </div>
 
-      <main className="flex flex-col lg:flex-row gap-6 px-6 pt-8 max-w-screen-xl mx-auto">
-        <div className="flex-1 bg-white rounded-xl shadow-md p-4">
-          <MicrometerCanvas />
+      <div className="w-80 bg-gray-100 border-l border-gray-300 flex flex-col justify-between">
+        <div className="p-4 overflow-y-auto">
+          <h2 className="text-xl font-semibold mb-2">Instructions</h2>
+          <ul className="list-disc list-inside text-sm space-y-1">
+            <li>Use the buttons below to interact with the micrometer.</li>
+            <li>Forward/Backward controls the thimble movement.</li>
+            <li>Left button rotates the ratchet and plays a sound.</li>
+            <li>Right button inserts the piece if spindle is open enough.</li>
+          </ul>
         </div>
 
-        <div className="lg:w-1/3 w-full flex flex-col justify-between bg-white rounded-xl shadow-md p-6">
-          <div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">
-              Instructions
-            </h2>
-            <StepGuide currentStep={currentStep} steps={steps} />
-          </div>
-
-          {isComplete && (
-            <div className="mt-6">
-              <SuccessPrompt />
-            </div>
-          )}
-
-          {!isComplete && (
-            <button
-              onClick={handleStepComplete}
-              className="mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition"
-            >
-              {currentStep < steps.length - 1 ? "Next Step" : "Finish"}
-            </button>
-          )}
+        <div className="p-4 border-t border-gray-300 bg-white">
+          <ButtonControl
+            onForward={handleForward}
+            onBackward={handleBackward}
+            onLeft={handleLeft}
+            onRight={handleRight}
+          />
         </div>
-      </main>
+      </div>
     </div>
   );
 }

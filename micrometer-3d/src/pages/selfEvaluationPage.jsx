@@ -3,12 +3,35 @@ import MicrometerCanvas from "../components/micrometer";
 import SuccessPrompt from "../components/successPrompt";
 import Header from "../components/Header";
 
+import ButtonControl from "../pages/buttonPage";
+
 export default function SelfEvaluation() {
   const [isComplete, setIsComplete] = useState(false);
 
   const handleComplete = () => {
     setIsComplete(true);
     localStorage.setItem("selfEvaluationCompleted", "true");
+  };
+
+  // Define handlers to pass to your ButtonControl
+  const onLeft = () => {
+    setCurrentStep((prev) => Math.max(0, prev - 1));
+  };
+
+  const onRight = () => {
+    if (!isComplete) {
+      handleStepComplete();
+    }
+  };
+
+  const onForward = () => {
+    if (!isComplete) {
+      handleStepComplete();
+    }
+  };
+
+  const onBackward = () => {
+    setCurrentStep((prev) => Math.max(0, prev - 1));
   };
 
   return (
@@ -18,6 +41,17 @@ export default function SelfEvaluation() {
       <main className="flex flex-col lg:flex-row gap-6 px-6 pt-8 max-w-screen-xl mx-auto">
         <div className="flex-1 bg-white rounded-xl shadow-md p-4">
           <MicrometerCanvas />
+
+          {!isComplete && (
+            <div className="absolute bottom-4 ">
+              <ButtonControl
+                onLeft={onLeft}
+                onRight={onRight}
+                onForward={onForward}
+                onBackward={onBackward}
+              />
+            </div>
+          )}
         </div>
 
         <div className="lg:w-1/3 w-full flex flex-col justify-between bg-white rounded-xl shadow-md p-6">

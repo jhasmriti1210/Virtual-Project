@@ -7,7 +7,7 @@ export default function Feedback() {
   useEffect(() => {
     const completed = localStorage.getItem("selfEvaluationCompleted");
     if (completed === "true") {
-      setIsAllowed(true);
+      setIsAllowed(false);
     }
   }, []);
 
