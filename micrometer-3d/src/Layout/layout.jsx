@@ -1,6 +1,7 @@
 import React from "react";
 import Header from "../Layout/header";
 import { Outlet } from "react-router-dom";
+import Footer from "../components/Footer";
 
 const Layout = () => {
   return (
@@ -9,6 +10,7 @@ const Layout = () => {
       <main className="flex-1 overflow-auto">
         <Outlet />
       </main>
+      <Footer />
     </div>
   );
 };

@@ -2,7 +2,7 @@ import React from "react";
 
 const VideoPage = () => {
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-6xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-4">
         How to Use Manual Micrometer Simulator
       </h1>
@@ -11,15 +11,14 @@ const VideoPage = () => {
         Manual Micrometer Simulator effectively.
       </p>
 
-      <div className="relative" style={{ paddingTop: "56.25%" }}>
-        <iframe
-          src="https://www.youtube.com/embed/cArXbfz3-HQ"
-          title="How to Use Manual Micrometer Simulator"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          className="absolute top-0 left-0 w-full h-full rounded shadow-lg"
-        ></iframe>
+      <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
+        <video
+          controls
+          className="absolute top-0 left-0 w-full h-full rounded shadow-lg object-cover"
+        >
+          <source src="/models/selfvideo.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
       </div>
     </div>
   );

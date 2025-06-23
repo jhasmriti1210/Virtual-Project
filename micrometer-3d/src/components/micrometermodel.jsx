@@ -5,8 +5,9 @@ import React, {
   forwardRef,
   useImperativeHandle,
 } from "react";
-import { useGLTF } from "@react-three/drei";
+import { useGLTF, Text } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
+import * as THREE from "three";
 
 const MicrometerModel = forwardRef((props, ref) => {
   const groupRef = useRef();
@@ -16,52 +17,60 @@ const MicrometerModel = forwardRef((props, ref) => {
   const prismRef = useRef();
   const anvilRef = useRef();
 
-  const originalThimbleX = 0.042;
+  const originalThimbleX = 0.015;
   const forwardStep = 0.0015;
   const ratchetOffset = 0.045;
   const spindleStartX = -0.04;
-  const minThimbleX = 0.012;
+  const prismWidth = 0.002;
 
   const [clickCount, setClickCount] = useState(0);
-  const [prismClicked, setPrismClicked] = useState(false);
+  const [prismClicked, setPrismClicked] = useState(true);
+  const [isSurfaceTouched, setIsSurfaceTouched] = useState(false);
+  const [isPrismInserted, setIsPrismInserted] = useState(false);
 
   const thimblePos = useRef(originalThimbleX);
-  const ratchetRotationZ = useRef(0);
+  const ratchetRotationX = useRef(0);
   const rotating = useRef(false);
   const groupRotationY = useRef(0);
 
   const updateSpindle = () => {
-    const movement = originalThimbleX - thimblePos.current;
-    const spindleX = spindleStartX + movement;
+    const spindleX = spindleStartX + (thimblePos.current - originalThimbleX);
     if (spindleRef.current) {
       spindleRef.current.position.x = spindleX;
     }
   };
 
   const moveThimbleForward = () => {
-    let newX = thimblePos.current + forwardStep;
-    if (newX > originalThimbleX) newX = originalThimbleX;
-    if (newX === thimblePos.current) return;
+    if (isSurfaceTouched || thimblePos.current <= originalThimbleX) return;
+
+    let newX = thimblePos.current - forwardStep;
+    if (newX <= originalThimbleX) {
+      newX = originalThimbleX;
+      setIsSurfaceTouched(true);
+    }
+
+    const spindleX = spindleStartX + (newX - originalThimbleX);
+
+    if (prismRef.current && prismClicked && isPrismInserted) {
+      const prismCenterX = prismRef.current.parent.position.x;
+      const prismLeftEdge = prismCenterX - prismWidth / 2;
+
+      if (spindleX <= prismLeftEdge) {
+        setIsSurfaceTouched(true);
+        return;
+      }
+    }
+
     thimblePos.current = newX;
   };
 
   const moveThimbleBackward = () => {
-    let newX = thimblePos.current - forwardStep;
-    const movement = originalThimbleX - newX;
-    const spindleX = spindleStartX + movement;
-
-    if (prismRef.current && prismClicked) {
-      const prismCenterX = prismRef.current.parent.position.x;
-      const prismWidth = 0.002;
-      const prismLeftEdge = prismCenterX - prismWidth / 2;
-
-      if (spindleX >= prismLeftEdge) return; // ❌ Stop before touching
-    }
-
-    if (newX < minThimbleX) newX = minThimbleX;
-    if (newX === thimblePos.current) return;
+    let newX = thimblePos.current + forwardStep;
+    const maxThimbleX = originalThimbleX + 0.025;
+    if (newX > maxThimbleX) newX = maxThimbleX;
 
     thimblePos.current = newX;
+    setIsSurfaceTouched(false);
   };
 
   const rotateRatchetWithSound = () => {
@@ -79,7 +88,7 @@ const MicrometerModel = forwardRef((props, ref) => {
       return newCount;
     });
 
-    const startAngle = ratchetRotationZ.current;
+    const startAngle = ratchetRotationX.current;
     const endAngle = startAngle + Math.PI / 2;
     const duration = 300;
     const startTime = performance.now();
@@ -87,7 +96,7 @@ const MicrometerModel = forwardRef((props, ref) => {
     const animate = (time) => {
       const elapsed = time - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      ratchetRotationZ.current =
+      ratchetRotationX.current =
         startAngle + (endAngle - startAngle) * progress;
 
       if (progress < 1) {
@@ -104,16 +113,31 @@ const MicrometerModel = forwardRef((props, ref) => {
     moveThimbleForward,
     moveThimbleBackward,
     rotateRatchetWithSound,
-    insertBetweenJaws: () => setPrismClicked(true),
+    insertBetweenJaws: () => {
+      setPrismClicked(true);
+      setIsSurfaceTouched(false);
+      setIsPrismInserted(true);
+    },
     getThimblePosition: () => thimblePos.current,
     getSpindleX: () => spindleRef.current?.position.x ?? 0,
+    getReading: () => {
+      if (isSurfaceTouched && clickCount >= 3 && isPrismInserted) {
+        return 55.0;
+      }
+      return 0.0;
+    },
   }));
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === "ArrowUp") moveThimbleForward();
-      else if (e.key === "ArrowDown") moveThimbleBackward();
+      if (e.key === "ArrowDown") moveThimbleForward();
+      else if (e.key === "ArrowUp") moveThimbleBackward();
       else if (e.key === "ArrowLeft") rotateRatchetWithSound();
+      else if (e.key === "ArrowRight") {
+        setPrismClicked(true);
+        setIsSurfaceTouched(false);
+        setIsPrismInserted(true);
+      }
     };
 
     const handleRightClick = (e) => {
@@ -123,6 +147,7 @@ const MicrometerModel = forwardRef((props, ref) => {
 
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("contextmenu", handleRightClick);
+
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("contextmenu", handleRightClick);
@@ -131,19 +156,28 @@ const MicrometerModel = forwardRef((props, ref) => {
 
   useFrame(() => {
     if (groupRef.current) groupRef.current.rotation.y = groupRotationY.current;
-    if (thimbleRef.current) thimbleRef.current.position.x = thimblePos.current;
+
+    thimblePos.current = Math.max(thimblePos.current, originalThimbleX);
+
+    if (thimbleRef.current) {
+      thimbleRef.current.position.x = thimblePos.current;
+    }
+
     if (ratchetRef.current) {
       ratchetRef.current.position.x = thimblePos.current + ratchetOffset;
-      ratchetRef.current.rotation.z = ratchetRotationZ.current;
+      ratchetRef.current.rotation.x = ratchetRotationX.current;
     }
+
     updateSpindle();
 
     if (prismRef.current && prismClicked) {
-      const prismWidth = 0.002;
-      const anvilX = anvilRef.current?.position.x ?? 0.007;
-      const prismX = anvilX + prismWidth / 2 - 0.042;
-
-      prismRef.current.parent.position.set(prismX, -0.009, -0.005);
+      if (!isPrismInserted) {
+        prismRef.current.parent.position.set(0, 0.2, 0);
+      } else {
+        const anvilX = anvilRef.current?.position.x ?? 0.007;
+        const prismX = anvilX + prismWidth / 2 - 0.042;
+        prismRef.current.parent.position.set(prismX, -0.009, -0.005);
+      }
     }
   });
 
@@ -167,7 +201,7 @@ const MicrometerModel = forwardRef((props, ref) => {
         object={anvil.scene}
         position={[0.007, 0.001, 0]}
       />
-      <primitive object={sleeve.scene} position={[originalThimbleX, 0, 0]} />
+      <primitive object={sleeve.scene} position={[0.042, 0, 0]} />
       <primitive
         ref={thimbleRef}
         object={thimble.scene}
@@ -185,15 +219,64 @@ const MicrometerModel = forwardRef((props, ref) => {
         rotation={[0, Math.PI / 2, 0]}
       />
 
-      {/* Rectangular test piece */}
-      <mesh position={[-0.15, 0.25, 0]} onClick={() => setPrismClicked(true)}>
-        <primitive
-          ref={prismRef}
-          object={prism.scene}
-          scale={[0.5, 0.5, 0.5]}
-          rotation={[0, 0, Math.PI / 2]}
-        />
-      </mesh>
+      {prismClicked && (
+        <mesh>
+          <primitive
+            ref={prismRef}
+            object={prism.scene}
+            scale={[0.5, 0.5, 0.5]}
+            rotation={[0, 0, Math.PI / 2]}
+          />
+        </mesh>
+      )}
+
+      {/* SHOW ARROWS ONLY AFTER PRISM IS INSERTED AND SURFACE IS TOUCHED */}
+      {isPrismInserted && isSurfaceTouched && (
+        <>
+          {/* Curved Arrow to Thimble */}
+          <mesh>
+            <tubeGeometry
+              args={[
+                new THREE.CatmullRomCurve3([
+                  new THREE.Vector3(0.025, 0.03, 0),
+                  new THREE.Vector3(0.035, 0.027, 0),
+                  new THREE.Vector3(0.025, 0.02, 0),
+                ]),
+                20,
+                0.0004,
+                8,
+                false,
+              ]}
+            />
+            <meshStandardMaterial color="black" />
+          </mesh>
+
+          <mesh position={[0.025, 0.02, 0]}>
+            <coneGeometry args={[0.002, 0.004, 8]} rotation={[Math.PI, 0, 0]} />
+            <meshStandardMaterial color="black" />
+          </mesh>
+
+          <Text position={[0.025, 0.012, 0]} fontSize={0.003} color="black">
+            Thimble (28)
+          </Text>
+
+          {/* Main Scale Arrow */}
+          <mesh position={[0.02, -0.02, 0]}>
+            <cylinderGeometry args={[0.0002, 0.0002, 0.015, 8]} />
+            <meshStandardMaterial color="black" />
+          </mesh>
+          <mesh position={[0.02, -0.013, 0]}>
+            <coneGeometry
+              args={[0.0016, 0.004, 8]}
+              rotation={[Math.PI, 0, 0]}
+            />
+            <meshStandardMaterial color="black" />
+          </mesh>
+          <Text position={[0.019, -0.03, 0]} fontSize={0.002} color="black">
+            Main Scale (6 mm)
+          </Text>
+        </>
+      )}
 
       {props.children}
     </group>

@@ -10,11 +10,11 @@ import MicrometerModel from "./micrometermodel";
 
 const MicrometerCanvas = forwardRef((props, ref) => {
   const modelRef = useRef();
-  const [controlsEnabled, setControlsEnabled] = useState(true);
+  const [controlsEnabled] = useState(true);
 
   useImperativeHandle(ref, () => ({
-    moveThimbleForward: () => modelRef.current?.moveThimbleBackward(),
-    moveThimbleBackward: () => modelRef.current?.moveThimbleForward(),
+    moveThimbleForward: () => modelRef.current?.moveThimbleForward(),
+    moveThimbleBackward: () => modelRef.current?.moveThimbleBackward(),
     rotateRatchetWithSound: () => modelRef.current?.rotateRatchetWithSound(),
     getThimblePosition: () => modelRef.current?.getThimblePosition?.(),
     insertBetweenJaws: () => modelRef.current?.insertBetweenJaws?.(),

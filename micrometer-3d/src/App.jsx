@@ -8,7 +8,6 @@ import VideoPage from "./pages/videoPage";
 import SelfEvaluation from "./pages/selfEvaluationPage";
 import HomePage from "./pages/homePage";
 import FeedbackPage from "./pages/feedbackPage";
-// import Surface from "./components/recsurface";
 
 function App() {
   return (
@@ -23,7 +22,6 @@ function App() {
             <Route path="/video" element={<VideoPage />} />
             <Route path="/selfevaluation" element={<SelfEvaluation />} />
             <Route path="/feedback" element={<FeedbackPage />} />
-            {/* <Route path="/surface" element={<Surface />} /> */}
           </Routes>
         </main>
         <Footer />

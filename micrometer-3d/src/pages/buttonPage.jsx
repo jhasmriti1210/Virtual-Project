@@ -5,6 +5,7 @@ export default function ButtonControl({
   onBackward,
   onLeft,
   onRight,
+  isForwardDisabled,
 }) {
   const [activeBtn, setActiveBtn] = useState(null);
 
@@ -21,6 +22,7 @@ export default function ButtonControl({
     justifyContent: "center",
     alignItems: "center",
     userSelect: "none",
+    transition: "all 0.2s ease",
   };
 
   const activeButtonStyle = {
@@ -28,38 +30,37 @@ export default function ButtonControl({
     borderColor: "#66b0ff",
   };
 
-  const handleMouseDown = (btn) => {
-    setActiveBtn(btn);
+  const disabledStyle = {
+    opacity: 0.5,
+    cursor: "not-allowed",
   };
 
-  const handleMouseUp = () => {
-    setActiveBtn(null);
-  };
+  const handleMouseDown = (btn) => setActiveBtn(btn);
+  const handleMouseUp = () => setActiveBtn(null);
 
   return (
     <div
       style={{
-        position: "absolute",
-        bottom: "30px",
-        left: "50%",
-        transform: "translateX(-50%)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         gap: "10px",
-        marginLeft: "34rem",
+        marginTop: "1rem",
       }}
     >
       <button
         style={{
           ...buttonStyle,
           ...(activeBtn === "forward" ? activeButtonStyle : {}),
+          ...(isForwardDisabled ? disabledStyle : {}),
         }}
         onClick={onForward}
         onMouseDown={() => handleMouseDown("forward")}
         onMouseUp={handleMouseUp}
+        title="Move Thimble Forward (Close)"
+        disabled={isForwardDisabled}
       >
-        ↑
+        ↓
       </button>
 
       <div style={{ display: "flex", gap: "10px" }}>
@@ -71,6 +72,7 @@ export default function ButtonControl({
           onClick={onLeft}
           onMouseDown={() => handleMouseDown("left")}
           onMouseUp={handleMouseUp}
+          title="Rotate Ratchet"
         >
           ←
         </button>
@@ -83,6 +85,7 @@ export default function ButtonControl({
           onClick={onRight}
           onMouseDown={() => handleMouseDown("right")}
           onMouseUp={handleMouseUp}
+          title="Insert Between Anvil and Spindle"
         >
           →
         </button>
@@ -96,8 +99,9 @@ export default function ButtonControl({
         onClick={onBackward}
         onMouseDown={() => handleMouseDown("backward")}
         onMouseUp={handleMouseUp}
+        title="Move Thimble Backward (Open)"
       >
-        ↓
+        ↑
       </button>
     </div>
   );
