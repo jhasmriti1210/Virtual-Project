@@ -10,7 +10,7 @@ export default function Feedback() {
   }, []);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen mt-48">
       <Header />
       <main className="max-w-5xl mx-auto px-6 py-12 bg-white rounded-xl shadow-md mt-10 ">
         {isAllowed ? (

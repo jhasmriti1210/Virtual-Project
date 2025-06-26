@@ -64,7 +64,7 @@ export default function SelfSimulationPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-r from-blue-50 to-white">
+    <div className="flex min-h-screen bg-gradient-to-r from-blue-50 to-white mt-48">
       {/* 3D Display */}
       <div className="flex-1 relative">
         <MicrometerCanvas ref={micrometerRef} />

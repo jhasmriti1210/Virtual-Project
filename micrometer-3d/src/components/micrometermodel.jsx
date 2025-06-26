@@ -27,7 +27,9 @@ const MicrometerModel = forwardRef((props, ref) => {
   const [prismClicked, setPrismClicked] = useState(true);
   const [isSurfaceTouched, setIsSurfaceTouched] = useState(false);
   const [isPrismInserted, setIsPrismInserted] = useState(false);
+  const [isRatchetTight, setIsRatchetTight] = useState(false);
 
+  const ratchetClickCountRef = useRef(0);
   const thimblePos = useRef(originalThimbleX);
   const ratchetRotationX = useRef(0);
   const rotating = useRef(false);
@@ -79,14 +81,17 @@ const MicrometerModel = forwardRef((props, ref) => {
     rotating.current = true;
     const audio = new Audio("/models/sound2.mp3");
 
-    setClickCount((prev) => {
-      const newCount = prev + 1;
-      if (newCount >= 3) {
-        audio.currentTime = 0;
-        audio.play();
-      }
-      return newCount;
-    });
+    ratchetClickCountRef.current += 1;
+    setClickCount(ratchetClickCountRef.current);
+
+    if (ratchetClickCountRef.current >= 3) {
+      audio.currentTime = 0;
+      audio.play();
+    }
+
+    if (ratchetClickCountRef.current === 5) {
+      setIsRatchetTight(true);
+    }
 
     const startAngle = ratchetRotationX.current;
     const endAngle = startAngle + Math.PI / 2;
@@ -190,7 +195,7 @@ const MicrometerModel = forwardRef((props, ref) => {
   const prism = useGLTF("/models/rectangular_prism.glb");
 
   return (
-    <group ref={groupRef} scale={[50, 50, 50]} position={[-1, 0, 0]}>
+    <group ref={groupRef} scale={[40, 40, 40]} position={[-0.6, 0, 0]}>
       <primitive
         object={frame.scene}
         position={[0.01, 0, 0]}
@@ -230,15 +235,63 @@ const MicrometerModel = forwardRef((props, ref) => {
         </mesh>
       )}
 
-      {/* SHOW ARROWS ONLY AFTER PRISM IS INSERTED AND SURFACE IS TOUCHED */}
-      {isPrismInserted && isSurfaceTouched && (
+      {isPrismInserted && isSurfaceTouched && clickCount < 3 && (
+        <Text
+          position={[
+            (spindleRef.current?.position.x ?? -0.04) + 0.03,
+            0.025,
+            0,
+          ]}
+          fontSize={0.003}
+          color="red"
+          anchorX="center"
+          anchorY="middle"
+        >
+          Spindle Successfully touched the 3D Rectangular Pieces! Now do Next
+          Step.
+        </Text>
+      )}
+
+      {isPrismInserted && isSurfaceTouched && clickCount >= 3 && (
         <>
-          {/* Curved Arrow to Thimble */}
+          <>
+            {/* Background box behind text */}
+            <mesh position={[0.025, 0.06, -0.001]}>
+              <planeGeometry args={[0.15, 0.02]} />
+              <meshBasicMaterial color="white" opacity={0.9} transparent />
+            </mesh>
+
+            {/* Foreground text */}
+            <Text
+              position={[0.025, 0.06, 0]}
+              fontSize={0.005}
+              color="green"
+              anchorX="center"
+              anchorY="middle"
+            >
+              Ratchet tightened! Proceed to take the reading.
+            </Text>
+          </>
+
+          <Text position={[0.025, 0.036, 0]} fontSize={0.0035} color="black">
+            Thimble (28 divisions)
+          </Text>
+
+          <Text
+            position={[0.025, 0.033, 0]}
+            fontSize={0.003}
+            color="black"
+            anchorX="center"
+            anchorY="top"
+          >
+            The aligned thimble line is the 28th division
+          </Text>
+
           <mesh>
             <tubeGeometry
               args={[
                 new THREE.CatmullRomCurve3([
-                  new THREE.Vector3(0.025, 0.03, 0),
+                  new THREE.Vector3(0.03, 0.03, 0),
                   new THREE.Vector3(0.035, 0.027, 0),
                   new THREE.Vector3(0.025, 0.02, 0),
                 ]),
@@ -256,15 +309,20 @@ const MicrometerModel = forwardRef((props, ref) => {
             <meshStandardMaterial color="black" />
           </mesh>
 
-          <Text position={[0.025, 0.012, 0]} fontSize={0.003} color="black">
-            Thimble (28)
+          <mesh position={[0.025, 0.015, 0]}>
+            <cylinderGeometry args={[0.0002, 0.0002, 0.015, 8]} />
+            <meshStandardMaterial color="black" />
+          </mesh>
+
+          <Text position={[0.019, -0.03, 0]} fontSize={0.002} color="black">
+            Main Scale (5 mm)
           </Text>
 
-          {/* Main Scale Arrow */}
           <mesh position={[0.02, -0.02, 0]}>
             <cylinderGeometry args={[0.0002, 0.0002, 0.015, 8]} />
             <meshStandardMaterial color="black" />
           </mesh>
+
           <mesh position={[0.02, -0.013, 0]}>
             <coneGeometry
               args={[0.0016, 0.004, 8]}
@@ -272,9 +330,6 @@ const MicrometerModel = forwardRef((props, ref) => {
             />
             <meshStandardMaterial color="black" />
           </mesh>
-          <Text position={[0.019, -0.03, 0]} fontSize={0.002} color="black">
-            Main Scale (6 mm)
-          </Text>
         </>
       )}
 
